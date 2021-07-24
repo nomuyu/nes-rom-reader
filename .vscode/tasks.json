@@ -18,7 +18,7 @@
 				"--target",
 				"x86_64-pc-windows-msvc"
 			],
-			"label": "Rust: wincargo run - td4-emu",
+			"label": "Rust: wincargo run - nes-rom-reader",
 			"group": {
 				"kind": "build",
 				"isDefault": true
