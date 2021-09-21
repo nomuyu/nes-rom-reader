@@ -1,13 +1,14 @@
 extern crate image;
 extern crate piston_window;
 
-mod casette;
+mod cassette;
 
-use casette::Casette;
+use cassette::Cassette;
 
 fn main() {
     println!("Hello World");
 
-    let casette = Casette::load("../nes-roms/sample1.nes").unwrap();
-    casette.show();
+    // let casette = Casette::load("../nes-roms/Super Mario Bros.nes").unwrap();
+    let cassette = Cassette::load("../nes-roms/sample1.nes").unwrap();
+    cassette.show();
 }

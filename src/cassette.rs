@@ -9,14 +9,14 @@ use ::image;
 use piston_window::*;
 
 #[derive(Default)]
-pub struct Casette {
+pub struct Cassette {
     pub prgrom_size: usize,
     pub chrrom_size: usize,
     pub prgrom: Vec<u8>,
     pub chrrom: Vec<u8>,
 }
 
-impl fmt::Debug for Casette {
+impl fmt::Debug for Cassette {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let prgrom = format!("prgrom: {{ value: [...] }}");
         let chrrom = format!("chrrom: {{ value: [...] }}");
@@ -29,7 +29,7 @@ impl fmt::Debug for Casette {
     }
 }
 
-impl Casette {
+impl Cassette {
     pub fn load(path: &str) -> Result<Self, io::Error> {
         let mut f = File::open(path)?;
         // let mut buffer = Vec::new();
@@ -91,7 +91,7 @@ impl Casette {
             }
         }
 
-        Ok(Casette {
+        Ok(Cassette {
             prgrom_size,
             chrrom_size,
             prgrom,
@@ -117,10 +117,14 @@ impl Casette {
         // img.put_pixel(x: u32, y: u32, pixel: P);
 
         const COLOR_PALLETTE: [[u8; 4]; 4] = [
-            [0, 0, 0, 255],       //black
-            [0, 0, 0, 255],       //black
-            [0, 0, 0, 255],       //black
-            [255, 255, 255, 255], //white
+            // [0x69, 0xA2, 0xFF, 255], //transparent
+            // [0xBA, 0x06, 0, 255],    //color index = 6
+            // [0xFF, 0x88, 0x33, 255], //color index = 38
+            // [0xC4, 0x62, 0x00, 255], //color index = 8
+            [0, 0, 0, 255],       //Black
+            [0, 0, 0, 255],       //Black
+            [255, 0, 0, 255],     //Black
+            [255, 255, 255, 255], //White
         ];
 
         // println!("{}", num);
@@ -133,7 +137,7 @@ impl Casette {
                 .try_into()
                 .unwrap();
 
-            let cindexes = Casette::calc_cindex(sprite);
+            let cindexes = Cassette::calc_cindex(sprite);
 
             let row = sprite_index % w;
             let col = sprite_index / w;
@@ -153,7 +157,7 @@ impl Casette {
     }
 
     pub fn show(&self) {
-        const SCALE: u32 = 3;
+        const SCALE: u32 = 5;
         let img = match self.img() {
             Some(img) => img,
             None => image::ImageBuffer::new(200, 100),
@@ -191,6 +195,20 @@ impl Casette {
                             graphics,
                         );
                     });
+                }
+                Event::Input(_, _) => {
+                    if let Some(Button::Keyboard(key)) = event.press_args() {
+                        match key {
+                            Key::P => {
+                                match img.save("sprite.png") {
+                                    Ok(()) => {}
+                                    Err(e) => {}
+                                }
+                                println!("Save the screen");
+                            }
+                            _ => {}
+                        }
+                    }
                 }
                 _ => {}
             }
@@ -239,7 +257,7 @@ fn sprite_test() {
         0x18,
     ];
 
-    let palette = Casette::calc_cindex(sprite);
+    let palette = Cassette::calc_cindex(sprite);
     let heart = [
         0, 3, 3, 0, 0, 3, 3, 0, 0, 3, 1, 3, 3, 3, 3, 3, 3, 1, 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 3, 3,
         3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 3, 3, 3, 3, 3, 3, 0, 0, 0, 3, 3, 3, 3, 0, 0, 0, 0, 0, 3,
@@ -251,7 +269,7 @@ fn sprite_test() {
 
 #[test]
 fn save_img() {
-    Casette::load("sample1.nes")
+    Cassette::load("sample1.nes")
         .unwrap()
         .img()
         .unwrap()
